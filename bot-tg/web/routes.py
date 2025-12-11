@@ -591,21 +591,33 @@ app.include_router(router)
 from web.admin_routes import router as admin_router
 app.include_router(admin_router)
 
+
 # Serve static files
 # We need to get absolute path to avoid issues
 static_path = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=static_path), name="static")
 
+# Mount Teremok Landing (Bundled)
+teremok_path = os.path.join(os.path.dirname(__file__), "apps/teremok")
+if os.path.exists(teremok_path):
+    app.mount("/teremok-app", StaticFiles(directory=teremok_path, html=True), name="teremok_app")
+
+# Mount Formula App (Bundled)
+formula_path = os.path.join(os.path.dirname(__file__), "apps/formula")
+if os.path.exists(formula_path):
+    app.mount("/formula-app", StaticFiles(directory=formula_path, html=True), name="formula_app")
+
 from fastapi.responses import RedirectResponse
 
 @app.get("/")
 async def read_root():
-    """Redirect root to main hub"""
-    return RedirectResponse(url="/app/hub")
+    """Redirect root to main hub or teremok"""
+    return RedirectResponse(url="/teremok-app/")
 
 @app.get("/admin")
 async def admin_root():
     """Redirect /admin to /app/admin/dashboard"""
     return RedirectResponse(url="/app/admin/dashboard")
+
 
 
